@@ -1,0 +1,43 @@
+# .github/workflows/go-ci.yml
+
+name: Go CI/CD Pipeline
+
+on:
+  # Déclenche le workflow sur les événements 'push' et 'pull_request' 
+  # ciblant la branche 'main'.
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Nom de la tâche : 'build'
+  build:
+    # Exécuter sur une machine virtuelle Linux (le runner)
+    runs-on: ubuntu-latest
+    
+    steps:
+    # --- 1. Étape de configuration de l'environnement ---
+
+    # Checkout : Récupère le code du dépôt (essentiel)
+    - uses: actions/checkout@v4
+
+    # Setup Go : Installe Go 1.22 sur le runner
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+        
+    # --- 2. Étape de vérification du code ---
+    
+    # Download Dependencies : Télécharge les modules Go requis
+    - name: Download dependencies
+      run: go mod download
+
+    # Build : Compile le code pour vérifier qu'il n'y a pas d'erreurs de syntaxe
+    - name: Build
+      run: go build -v ./...
+      
+    # Test : Lance tous les tests unitaires
+    - name: Test
+      run: go test -v ./...
